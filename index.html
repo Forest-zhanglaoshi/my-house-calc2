@@ -5,10 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>买房 VS 租房：谁更划算？</title>
     <style>
-        :root { --buy-color: #3498db; --rent-color: #f1c40f; --text-main: #2c3e50; }
+        :root { --buy-color: #3498db; --rent-color: #f1c40f; --text-main: #2c3e50; --tip-bg: rgba(44, 62, 80, 0.95); }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: var(--text-main); margin: 0; padding: 20px; font-size: 14px; }
         .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         header { text-align: center; margin-bottom: 25px; }
+        
+        /* 悬浮注释样式 */
+        .tip { display: inline-block; width: 14px; height: 14px; background: #95a5a6; color: white; border-radius: 50%; text-align: center; line-height: 14px; font-size: 10px; cursor: help; margin-left: 4px; position: relative; }
+        .tip:hover::after {
+            content: attr(data-content);
+            position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+            width: 200px; padding: 10px; background: var(--tip-bg); color: #fff;
+            font-size: 12px; line-height: 1.5; border-radius: 6px; z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: left; font-weight: normal;
+        }
+
         .logic-note { background: #fffaf0; padding: 18px; border-radius: 8px; font-size: 13px; color: #856404; margin-bottom: 25px; line-height: 1.7; border: 1px solid #ffeeba; }
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .card { padding: 22px; border-radius: 12px; border: 1px solid #eee; }
@@ -19,13 +30,14 @@
         .flex-item { flex: 1; }
         label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #555; }
         input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .tax-info { font-size: 11px; margin-top: 5px; color: #7f8c8d; }
+        .tax-link { color: #3498db; text-decoration: none; border-bottom: 1px dashed #3498db; }
         button { width: 100%; padding: 16px; background: #2c3e50; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; }
         #result-area { margin-top: 35px; display: none; }
         .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .res-box { padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #ddd; }
         .highlight { font-size: 24px; font-weight: bold; display: block; margin: 8px 0; }
         .analysis-report { margin-top: 30px; padding: 25px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; line-height: 1.8; }
-        .tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #eee; margin-left: 5px; vertical-align: middle; }
         @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -34,12 +46,14 @@
 <div class="container">
     <header>
         <h1>买房 VS 租房：谁更划算？</h1>
-        <p style="color: #666;">本模型深度分析租房 X 年对比买房，个人财富的真实损益情况</p>
+        <p style="color: #666;">深度分析租房 X 年对比买房，个人财富的真实损益情况</p>
     </header>
 
     <div class="logic-note">
-        <strong>💡 核心模型说明：全现金流机会成本法</strong><br>
-        本模型认为：任何一笔资金的支出（无论是房贷、租金还是税装），都损失了其在剩余年限内通过理财产生收益的可能。越早支出的资金，损耗的机会成本越高。
+        <strong>💡 核心模型：全现金流机会成本法 
+            <span class="tip" data-content="本模型认为：任何一笔离开口袋的钱（房贷、租金、税装），都损失了其在剩余年限内本可以产生的理财复利收益。">ⓘ</span>
+        </strong><br>
+        对比的是在 X 年后，您手中这笔初始“首付本金”在两种决策下的最终残余价值。
     </div>
 
     <div class="main-grid">
@@ -61,7 +75,7 @@
             </div>
             <div class="flex-row">
                 <div class="flex-item">
-                    <label>公积金利率 (%)</label>
+                    <label>公积金利率 (%) <span class="tip" data-content="目前主流等额本息还款模式，前期利息占比极高。">ⓘ</span></label>
                     <input type="number" id="gjjRate" value="2.85" step="0.01">
                 </div>
                 <div class="flex-item">
@@ -77,9 +91,12 @@
                 <div class="flex-item">
                     <label>税费比例 (%)</label>
                     <input type="number" id="taxRate" value="1.5">
+                    <div class="tax-info">
+                        🔍 <a href="https://mp.weixin.qq.com/s/b1NR1U_jTrsHI4q29EQ8UA" target="_blank" class="tax-link">最新税费政策查询</a>
+                    </div>
                 </div>
             </div>
-            <label>X 年后房价总涨跌幅 (%)</label>
+            <label>X 年后房价总涨跌幅 (%) <span class="tip" data-content="指 X 年后房产市值的总变动。例如跌10%则输入 -10。">ⓘ</span></label>
             <input type="number" id="totalPriceChange" value="0">
         </div>
 
@@ -90,7 +107,7 @@
                 <input type="number" id="X" value="10">
             </div>
             <div class="input-group" style="margin-bottom:15px;">
-                <label>预期理财年化收益 (%)</label>
+                <label>预期理财年化收益 (%) <span class="tip" data-content="这是衡量机会成本的关键：即这笔钱不买房而拿去稳健理财的年收益率。">ⓘ</span></label>
                 <input type="number" id="investRate" value="2.5">
             </div>
             <div class="input-group" style="margin-bottom:15px;">
@@ -109,11 +126,11 @@
     <div id="result-area">
         <div class="result-grid">
             <div class="res-box" style="border-top:4px solid var(--buy-color);">
-                <span style="color:#666;">买房 X 年后盈亏余值</span>
+                <span style="color:#666;">买房 X 年后盈亏余值 <span class="tip" data-content="这是扣除了利息、税装成本、月供理财损耗后的首付本金剩余价值。">ⓘ</span></span>
                 <span class="highlight" id="res_buy_final" style="color:var(--buy-color);">--</span>
             </div>
             <div class="res-box" style="border-top:4px solid var(--rent-color);">
-                <span style="color:#666;">租房 X 年后盈亏余值</span>
+                <span style="color:#666;">租房 X 年后盈亏余值 <span class="tip" data-content="这是首付理财后的总额扣除租金及租金理财损耗后的剩余价值。">ⓘ</span></span>
                 <span class="highlight" id="res_rent_final" style="color:#d4af37;">--</span>
             </div>
         </div>
@@ -122,14 +139,14 @@
 </div>
 
 <script>
+// (此处保持之前的计算逻辑脚本不变，仅补充渲染逻辑)
 function calculate() {
-    // 基础参数获取
     const X = parseFloat(document.getElementById('X').value);
     const P = parseFloat(document.getElementById('price').value);
     const dr = parseFloat(document.getElementById('downRate').value) / 100;
     const loanY = parseFloat(document.getElementById('loanYears').value);
     const decor = parseFloat(document.getElementById('decor').value);
-    const gjjP = 90; // 假设深圳公积金限额
+    const gjjP = 90; 
     const gjjR_m = parseFloat(document.getElementById('gjjRate').value) / 100 / 12;
     const bizR_m = parseFloat(document.getElementById('bizRate').value) / 100 / 12;
     const taxR = parseFloat(document.getElementById('taxRate').value) / 100;
@@ -139,80 +156,59 @@ function calculate() {
     const ir_m = parseFloat(document.getElementById('investRate').value) / 100 / 12;
 
     const downPayment = P * dr;
-    const initialTax = P * taxR;
+    const initialCosts = (P * taxR) + decor;
     const totalLoan = P * (1 - dr);
     const bizP = Math.max(0, totalLoan - gjjP);
 
-    // 月供计算 (等额本息)
     const mPayGjj = gjjP > 0 ? (gjjP * gjjR_m * Math.pow(1 + gjjR_m, loanY*12)) / (Math.pow(1 + gjjR_m, loanY*12) - 1) : 0;
     const mPayBiz = bizP > 0 ? (bizP * bizR_m * Math.pow(1 + bizR_m, loanY*12)) / (Math.pow(1 + bizR_m, loanY*12) - 1) : 0;
     const totalMonthlyPay = mPayGjj + mPayBiz;
 
-    // --- 1. 买房模型计算 ---
     let buyTotalInterest = 0;
     let buyOppCost = 0;
     let tempGjj = gjjP;
     let tempBiz = bizP;
-    
-    // 初始税装的机会成本 (X年复利)
-    const initialExtra = initialTax + decor;
-    buyOppCost += initialExtra * (Math.pow(1 + ir_m, X * 12) - 1);
+    buyOppCost += initialCosts * (Math.pow(1 + ir_m, X * 12) - 1);
 
     for (let i = 0; i < X * 12; i++) {
-        // 累计利息
         buyTotalInterest += (tempGjj * gjjR_m) + (tempBiz * bizR_m);
-        // 更新本金
         tempGjj -= (mPayGjj - tempGjj * gjjR_m);
         tempBiz -= (mPayBiz - tempBiz * bizR_m);
-        // 这一期月供的机会成本 (剩余时长复利)
         buyOppCost += (totalMonthlyPay / 10000) * (Math.pow(1 + ir_m, X * 12 - 1 - i) - 1);
     }
-    const houseValueGain = P * totalPc;
-    const buyFinal = downPayment - buyTotalInterest - initialExtra - buyOppCost + houseValueGain;
+    const buyFinal = downPayment - buyTotalInterest - initialCosts - buyOppCost + (P * totalPc);
 
-    // --- 2. 租房模型计算 ---
     let rentTotalPaid = 0;
     let rentOppCost = 0;
-    // 首付在理财下的自然增值收益 (用于后续抵扣)
     const downPaymentGain = downPayment * (Math.pow(1 + ir_m, X * 12) - 1);
-
     for (let i = 0; i < X * 12; i++) {
         let currentMonthRent = (r0 * Math.pow(1 + rc, Math.floor(i/12))) / 10000;
         rentTotalPaid += currentMonthRent;
-        // 这一期租金的机会成本 (剩余时长复利)
         rentOppCost += currentMonthRent * (Math.pow(1 + ir_m, X * 12 - 1 - i) - 1);
     }
     const rentFinal = downPayment + downPaymentGain - rentTotalPaid - rentOppCost;
 
-    // --- 3. 渲染结果 ---
     document.getElementById('result-area').style.display = 'block';
     document.getElementById('res_buy_final').innerText = buyFinal.toFixed(2) + " 万元";
     document.getElementById('res_rent_final').innerText = rentFinal.toFixed(2) + " 万元";
 
     const diff = buyFinal - rentFinal;
-    const report = document.getElementById('report');
-
-    report.innerHTML = `
+    document.getElementById('report').innerHTML = `
         <h3>📋 详尽损益审计报告</h3>
         <p><strong>1. 买房项明细：</strong></p>
         <ul>
-            <li><b>初始投入：</b>首付 ${downPayment.toFixed(1)}万，税装支出 ${initialExtra.toFixed(1)}万。</li>
-            <li><b>利息损耗：</b>X 年内累计支付银行利息 <b>${buyTotalInterest.toFixed(1)}</b> 万。</li>
-            <li><b>机会成本：</b>因税装及逐月还贷导致的理财损失合计 <b>${buyOppCost.toFixed(1)}</b> 万。</li>
-            <li><b>资产变动：</b>房价${totalPc >= 0 ? '上涨' : '下跌'}收益 <b>${houseValueGain.toFixed(1)}</b> 万。</li>
-            <li><b>最终盈亏：</b>初始本金在 X 年后残值为 <b>${buyFinal.toFixed(2)}</b> 万。</li>
+            <li><b>累计利息损耗：</b>支付银行利息 <b>${buyTotalInterest.toFixed(1)}</b> 万。</li>
+            <li><b>机会成本损耗：</b>由于税装及还贷资金被占用，损失理财潜在收益 <b>${buyOppCost.toFixed(1)}</b> 万。</li>
+            <li><b>资产净值变动：</b>房价波动收益 <b>${(P*totalPc).toFixed(1)}</b> 万。</li>
         </ul>
         <p><strong>2. 租房项明细：</strong></p>
         <ul>
-            <li><b>租金支出：</b>X 年内累计支付房租 <b>${rentTotalPaid.toFixed(1)}</b> 万。</li>
-            <li><b>机会成本：</b>因逐月支付房租导致的理财损失合计 <b>${rentOppCost.toFixed(1)}</b> 万。</li>
-            <li><b>理财收益：</b>首付本金 X 年产生的自然理财收益 <b>${downPaymentGain.toFixed(1)}</b> 万。</li>
-            <li><b>最终盈亏：</b>初始本金在 X 年后残值为 <b>${rentFinal.toFixed(2)}</b> 万。</li>
+            <li><b>租金显性支出：</b>累计支付房租 <b>${rentTotalPaid.toFixed(1)}</b> 万。</li>
+            <li><b>租金机会成本：</b>由于租金支出导致的理财复利损失 <b>${rentOppCost.toFixed(1)}</b> 万。</li>
+            <li><b>首付理财对冲：</b>首付本金在此期间通过理财增值 <b>${downPaymentGain.toFixed(1)}</b> 万。</li>
         </ul>
         <hr>
-        <p><strong>🚩 最终结论：</strong></p>
-        <p>在同等现金流压力下，经过 ${X} 年的复利博弈，<b>${diff > 0 ? '买房' : '租房'}</b>方案比另一种方案能让您的财富多出 <b>${Math.abs(diff).toFixed(2)}</b> 万元。</p>
-        <p><small>* 计算逻辑：本模型将每一分流出的现金都按 ${document.getElementById('investRate').value}% 的年化收益计入复利损失，真实还原了资金的时间价值。</small></p>
+        <p>🚩 <strong>最终结论：</strong>在全现金流博弈下，${X}年后<b>${diff > 0 ? '买房' : '租房'}</b>方案比另一种方案让资产多出 <b>${Math.abs(diff).toFixed(2)}</b> 万元。</p>
     `;
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
